@@ -1,65 +1,56 @@
-type Degrees = number;
-type PositionChangeEventHandler = (sender: Turtle, data: any) => void;
-type AngleChangeEventHandler = (sender: Turtle, data: any) => void;
+import { Notifier } from "../util/notifier";
 
-const toRad = (d: Degrees) => d / 180 * Math.PI;
+type Degrees = number;
+
+const toRad = (d: Degrees) => (d / 180) * Math.PI;
 
 export class Turtle {
-  x: number = 0;
-  y: number = 0;
-  a: Degrees = 0;
+    private _a: Degrees = 0;
+    private _x: number = 0;
+    private _y: number = 0;
 
-  public get radians(): number { return toRad(this.a); }
+    notifer: Notifier<Turtle> = new Notifier();
 
-  moveTo(x: number, y: number): void {
-    this.setPosition(x, y);
-  }
-
-  moveForward(d: number) {
-    const dx = d * Math.cos(this.radians + Math.PI / 2);
-    const dy = d * Math.sin(this.radians + Math.PI / 2);
-    this.setPosition(this.x + dx, this.y + dy);
-  }
-
-  turnTo(a: Degrees): void {
-    this.setAngle(a % 360);
-  }
-
-  turn(da: Degrees): void {
-    this.setAngle(this.a + da);
-  }
-
-  addPositionChangeEventHandler(id: string, handler: PositionChangeEventHandler) {
-    this.onPositionChangeMap.set(id, handler);
-  }
-
-  addAngleChangeEventHandler(id: string, handler: AngleChangeEventHandler) {
-    this.onAngleChangeMap.set(id, handler);
-  }
-
-  removePositionChangeEventHandler(id: string) {
-    this.onPositionChangeMap.delete(id);
-  }
-
-  removeAngleChangeEventHandler(id: string) {
-    this.onAngleChangeMap.delete(id);
-  }
-
-  private setPosition(x: number, y: number): void {
-    this.x = x;
-    this.y = y;
-    for (let [id, cb] of Array.from(this.onPositionChangeMap.entries())) {
-      cb(this, { id });
+    public get a() {
+        return this._a;
     }
-  }
-
-  private setAngle(a: Degrees): void {
-    this.a = a;
-    for (let [id, cb] of Array.from(this.onAngleChangeMap.entries())) {
-      cb(this, { id });
+    public get x() {
+        return this._x;
     }
-  }
+    public get y() {
+        return this._y;
+    }
 
-  private onPositionChangeMap: Map<string, PositionChangeEventHandler> = new Map();
-  private onAngleChangeMap: Map<string, AngleChangeEventHandler> = new Map();
+    public get radians(): number {
+        return toRad(this.a);
+    }
+
+    moveForward(d: number) {
+        const dx = d * Math.cos(this.radians + Math.PI / 2);
+        const dy = d * Math.sin(this.radians + Math.PI / 2);
+        this.setPosition(this.x + dx, this.y + dy);
+    }
+
+    moveTo(x: number, y: number): void {
+        this.setPosition(x, y);
+    }
+
+    turn(da: Degrees): void {
+        this.setAngle(this.a + da);
+    }
+
+    turnTo(a: Degrees): void {
+        this.setAngle(a % 360);
+    }
+
+    private setPosition(x: number, y: number): void {
+        this._x = x;
+        this._y = y;
+        this.notifer.notify(this, "set-position");
+    }
+
+    private setAngle(a: Degrees): void {
+        this._a = a;
+        this.notifer.notify(this, "set-angle");
+    }
 }
