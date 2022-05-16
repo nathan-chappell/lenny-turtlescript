@@ -5,6 +5,7 @@ import "./styles.css";
 import { SimpleRenderer } from "./render/simpleRenderer";
 import { Turtle } from "./turtles/turtle";
 import { createWhile } from "typescript";
+import { TurtleInterpreter } from "./turtleScript/turtleInterpreter";
 
 const turtle = new Turtle();
 
@@ -23,7 +24,7 @@ const crawl =async () => {
   await delay(500);
 }
 
-crawl();
+// crawl();
 
 function App() {
     let canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,7 +33,9 @@ function App() {
       const ctx = canvasRef.current?.getContext('2d');
       if (ctx) {
         new SimpleRenderer(ctx, turtle);
-      }
+        const interp = new TurtleInterpreter(turtle);
+        interp.interpret("f 50 f 50 l 45 f 50 l 45 f 50 r 90 f 100");
+      } 
     }, [canvasRef]);
 
     return (

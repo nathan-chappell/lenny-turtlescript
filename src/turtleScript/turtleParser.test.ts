@@ -1,4 +1,4 @@
-import { turtleLex } from "./turtleParser";
+import { turtleLex } from "./turtleLex";
 
 const testString1 = "forward left right r r f";
 
