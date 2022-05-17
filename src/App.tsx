@@ -29,7 +29,7 @@ const crawl = async () => {
 
 function App() {
     let canvasRef = useRef<HTMLCanvasElement>(null);
-    const [state, setState] = useState({
+    const [state] = useState({
         simpleRenderer: new SimpleRenderer(),
         turtleInterpreter: new TurtleInterpreter(),
     });
