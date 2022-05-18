@@ -9,6 +9,7 @@ import { TurtleInterpreter } from "./turtleScript/turtleInterpreter";
 import { Repl } from "./components/Repl";
 import { StackHistory } from "./util/history";
 import { styles } from "./styles";
+import { delay } from "./util/misc";
 
 const turtle = new Turtle();
 

@@ -41,8 +41,7 @@ export class SimpleRenderer {
         this._ctx = ctx;
         this._turtle = turtle;
         this.reset();
-
-        this._turtle.notifer.subscribe(this._id, (turtle: Turtle, args: EventArgs) => {
+        this._turtle.notifer.subscribe(this._id, (turtle: Turtle, args: EventArgs<null>) => {
             // this.positionSequence.push([turtle.x, turtle.y]);
             // this.render();
             if (!this._turtle || !this._ctx) return;

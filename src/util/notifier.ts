@@ -1,10 +1,15 @@
-export type EventArgs = { id: string; event: string };
-export type Handler<T> = (sender: T, event: EventArgs) => void;
+export interface EventArgs<Data> {
+    id: string;
+    event: string;
+    data: Data | null
+}
 
-export class Notifier<T> {
-    handlerMap: Map<string, Handler<T>> = new Map();
+export type Handler<T, D = any> = (sender: T, event: EventArgs<D>) => void;
 
-    subscribe(id: string, handler: Handler<T>): void {
+export class Notifier<T, D = any> {
+    handlerMap: Map<string, Handler<T, D>> = new Map();
+
+    subscribe(id: string, handler: Handler<T, D>): void {
         this.handlerMap.set(id, handler);
     }
 
@@ -12,9 +17,9 @@ export class Notifier<T> {
         this.handlerMap.delete(id);
     }
 
-    notify(sender: T, event: string) {
+    notify(sender: T, event: string, data: D | null = null) {
         for (const [id, handler] of Array.from(this.handlerMap.entries())) {
-            handler(sender, { id, event });
+            handler(sender, { id, event, data });
         }
     }
 }

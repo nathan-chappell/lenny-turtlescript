@@ -8,7 +8,7 @@ export class Turtle {
     private _x: number = 0;
     private _y: number = 0;
 
-    notifer: Notifier<Turtle> = new Notifier();
+    notifer: Notifier<Turtle, null> = new Notifier();
 
     public get a() {
         return this._a;

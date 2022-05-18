@@ -1,0 +1,1 @@
+export const delay = (t: number) => new Promise((res) => window.setTimeout(res, t));
