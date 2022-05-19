@@ -1,4 +1,4 @@
-import { Lexeme, turtleLex } from "./turtleLex";
+import { Lexeme, splitLexeme, turtleLex } from "./turtleLex";
 
 export interface CommandToken {
     type: "command";
@@ -19,11 +19,15 @@ export interface InvalidToken {
 
 export type TurtleToken = CommandToken | NumberToken | InvalidToken;
 
-const moveForwardKWlist = ["f", "move-forward"];
-const moveToKWlist = ["m", "move-to"];
-const turnLeftKWlist = ["l", "turn-left"];
-const turnRightKWlist = ["r", "turn-right"];
-const turnToKWlist = ["a", "turn-to"];
+const kwLists = {
+    moveForwardKWlist: ["f", "move-forward"],
+    moveToKWlist: ["m", "move-to"],
+    turnLeftKWlist: ["l", "turn-left"],
+    turnRightKWlist: ["r", "turn-right"],
+    turnToKWlist: ["a", "turn-to"],
+}
+
+const singleCharCommands = Object.values(kwLists).map(a => a[0]);
 
 // prettier-ignore
 class TokenFactory {
@@ -37,18 +41,26 @@ class TokenFactory {
     makeInvalidToken(lexeme: Lexeme): InvalidToken { return {type: "invalid", lexeme }; }
 }
 
-export function turtleTokenize(s: string): TurtleToken[] {
-    const lexemes = turtleLex(s);
+export function turtleTokenize(lexemes: Lexeme[]): TurtleToken[] {
     const factory = new TokenFactory();
     // prettier-ignore
     const result: TurtleToken[] = lexemes.map(lexeme => {
-        if (moveForwardKWlist.includes(lexeme.value)) { return factory.makeMoveForwardToken(lexeme); }
-        else if (moveToKWlist.includes(lexeme.value)) { return factory.makeMoveToToken(lexeme); }
-        else if (turnLeftKWlist.includes(lexeme.value)) { return factory.makeTurnLeftToken(lexeme); }
-        else if (turnRightKWlist.includes(lexeme.value)) { return factory.makeTurnRightToken(lexeme); }
-        else if (turnToKWlist.includes(lexeme.value)) { return factory.makeTurnToToken(lexeme); }
+        if (kwLists.moveForwardKWlist.includes(lexeme.value)) { return factory.makeMoveForwardToken(lexeme); }
+        else if (kwLists.moveToKWlist.includes(lexeme.value)) { return factory.makeMoveToToken(lexeme); }
+        else if (kwLists.turnLeftKWlist.includes(lexeme.value)) { return factory.makeTurnLeftToken(lexeme); }
+        else if (kwLists.turnRightKWlist.includes(lexeme.value)) { return factory.makeTurnRightToken(lexeme); }
+        else if (kwLists.turnToKWlist.includes(lexeme.value)) { return factory.makeTurnToToken(lexeme); }
         else if (!Number.isNaN(parseFloat(lexeme.value))) { return factory.makeNumberToken(lexeme); }
-        else { return factory.makeInvalidToken(lexeme); }
-    });
+        else {
+            const split = splitLexeme(lexeme);
+            if (split.length > 1) {
+                const subTokens = turtleTokenize(split);
+                if (subTokens.every(tok => tok.type != 'invalid')) {
+                    return subTokens;
+                }
+            }
+            return factory.makeInvalidToken(lexeme);
+        }
+    }).flat();
     return result;
 }

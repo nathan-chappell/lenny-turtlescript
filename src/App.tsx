@@ -7,50 +7,48 @@ import { Turtle } from "./turtles/turtle";
 import { createWhile } from "typescript";
 import { TurtleInterpreter } from "./turtleScript/turtleInterpreter";
 import { Repl } from "./components/Repl";
+import { StackHistory } from "./util/history";
 
 const turtle = new Turtle();
 
 turtle.notifer.subscribe("log", (o) => console.log(o));
 
-const delay = (t: number) => new Promise((res) => window.setTimeout(res, t));
-const crawl = async () => {
-    turtle.moveForward(50);
-    await delay(500);
-    turtle.moveForward(50);
-    await delay(500);
-    turtle.turn(-45);
-    turtle.moveForward(50);
-    await delay(500);
-    turtle.moveForward(50);
-    await delay(500);
-};
+class AppState {
+    simpleRenderer: SimpleRenderer = new SimpleRenderer();
+    turtleInterpreter: TurtleInterpreter = new TurtleInterpreter();
+    stackHistory: StackHistory = new StackHistory();
+}
 
-// crawl();
+const appState = new AppState();
 
 function App() {
     let canvasRef = useRef<HTMLCanvasElement>(null);
     const [state] = useState({
         simpleRenderer: new SimpleRenderer(),
         turtleInterpreter: new TurtleInterpreter(),
+        stackHistory: new StackHistory(),
     });
 
     const onLine = useCallback((line: string | null) => {
       state.turtleInterpreter.interpret(line ?? "");
-    },[state])
+    },[])
+
+    const onClear = useCallback(() => {
+        state.simpleRenderer.reset();
+    },[])
 
     useEffect(() => {
         const ctx = canvasRef.current?.getContext("2d");
         if (ctx) {
             state.simpleRenderer.connect(ctx, turtle);
             state.turtleInterpreter.connect(turtle);
-            // state.turtleInterpreter.interpret("f 50 f 50 l 45 f 50 l 45 f 50 r 90 f 100");
         }
-    }, [canvasRef, state]);
+    }, [canvasRef]);
 
     return (
         <div className="App">
             <canvas width={400} height={400} ref={canvasRef} />
-            <Repl onLine={onLine} onClear={() => {}} />
+            <Repl onLine={onLine} onClear={() => onClear()} stackHistory={state.stackHistory} />
         </div>
     );
 }

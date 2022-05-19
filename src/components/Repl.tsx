@@ -5,11 +5,11 @@ import { StackHistory } from "../util/history";
 export interface IReplProps {
     onLine: (line: string | null) => void;
     onClear: () => void;
+    stackHistory: StackHistory;
 }
 
-export const Repl = ({ onLine, onClear }: IReplProps) => {
+export const Repl = ({ onLine, onClear, stackHistory }: IReplProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
-    const [state] = useState({ history: new StackHistory() });
 
     const onKeyDown: KeyboardEventHandler<HTMLInputElement> = useCallback(
         (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -17,22 +17,22 @@ export const Repl = ({ onLine, onClear }: IReplProps) => {
                 const value = inputRef.current?.value ?? null;
                 onLine(value);
                 if (value) {
-                    state.history.push(value);
+                    stackHistory.push(value);
                 }
                 inputRef.current!.value = "";
             } else if (e.key === "ArrowUp") {
-                const previous = state.history.previous();
+                const previous = stackHistory.previous();
                 if (previous && inputRef.current) {
                     inputRef.current.value = previous;
                 }
             } else if (e.key === "ArrowDown") {
-                const next = state.history.next();
-                if (next && inputRef.current) {
-                    inputRef.current.value = next;
+                const next = stackHistory.next();
+                if (inputRef.current) {
+                    inputRef.current.value = next ?? "";
                 }
             }
         },
-        [onLine, state.history]
+        [onLine, stackHistory]
     );
 
     return (

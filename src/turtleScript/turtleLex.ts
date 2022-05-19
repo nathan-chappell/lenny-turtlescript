@@ -30,3 +30,11 @@ export function turtleLex(s: string): Lexeme[] {
     pushLexeme();
     return result;
 }
+
+export function splitLexeme(lexeme: Lexeme) {
+    const result: Lexeme[] = [];
+    for (let i = 0; i < lexeme.value.length; ++i) {
+        result.push({value: lexeme.value[i], position: lexeme.position + i});
+    }
+    return result;
+}

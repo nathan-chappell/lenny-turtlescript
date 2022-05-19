@@ -1,6 +1,5 @@
+import { Degrees, Point } from "../util/geometry";
 import { Notifier } from "../util/notifier";
-
-type Degrees = number;
 
 const toRad = (d: Degrees) => (d / 180) * Math.PI;
 
@@ -25,10 +24,21 @@ export class Turtle {
         return toRad(this.a);
     }
 
+    reset() {
+        this.moveTo(0,0);
+        this.turnTo(0);
+    }
+
+    lookToward(d: number, a: Degrees): Point {
+        const angle = toRad(this.a + a);
+        const dx = d * Math.cos(angle + Math.PI / 2);
+        const dy = d * Math.sin(angle + Math.PI / 2);
+        return [this.x + dx, this.y + dy];
+    }
+
     moveForward(d: number) {
-        const dx = d * Math.cos(this.radians + Math.PI / 2);
-        const dy = d * Math.sin(this.radians + Math.PI / 2);
-        this.setPosition(this.x + dx, this.y + dy);
+        const [x,y] = this.lookToward(d, 0);
+        this.setPosition(x, y);
     }
 
     moveTo(x: number, y: number): void {

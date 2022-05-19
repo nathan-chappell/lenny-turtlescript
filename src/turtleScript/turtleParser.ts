@@ -1,3 +1,4 @@
+import { turtleLex } from "./turtleLex";
 import { CommandToken, NumberToken, TurtleToken, turtleTokenize } from "./turtleTok";
 
 type TokenSingle = [TurtleToken];
@@ -107,7 +108,8 @@ export type TurtleCommand =
 
 export function turtleParse(s: string): TurtleCommand[] {
     let result: TurtleCommand[] = [];
-    const tokens = turtleTokenize(s);
+    const lexemes = turtleLex(s);
+    const tokens = turtleTokenize(lexemes);
     const factory: CommandFactory = new CommandFactory();
 
     //prettier-ignore
