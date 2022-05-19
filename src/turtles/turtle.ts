@@ -25,8 +25,8 @@ export class Turtle {
     }
 
     reset() {
-        this.moveTo(0,0);
-        this.turnTo(0);
+        this.setPosition(0, 0, "reset-position");
+        this.setAngle(0, "reset-angle");
     }
 
     lookToward(d: number, a: Degrees): Point {
@@ -37,7 +37,7 @@ export class Turtle {
     }
 
     moveForward(d: number) {
-        const [x,y] = this.lookToward(d, 0);
+        const [x, y] = this.lookToward(d, 0);
         this.setPosition(x, y);
     }
 
@@ -53,14 +53,16 @@ export class Turtle {
         this.setAngle(a % 360);
     }
 
-    private setPosition(x: number, y: number): void {
+    private setPosition(x: number, y: number, event: string = "set-position"): void {
+        this.notifer.notify(this, `pre-${event}`);
         this._x = x;
         this._y = y;
-        this.notifer.notify(this, "set-position");
+        this.notifer.notify(this, event);
     }
 
-    private setAngle(a: Degrees): void {
+    private setAngle(a: Degrees, event: string = "set-angle"): void {
+        this.notifer.notify(this, `pre-${event}`);
         this._a = a;
-        this.notifer.notify(this, "set-angle");
+        this.notifer.notify(this, event);
     }
 }

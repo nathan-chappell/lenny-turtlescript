@@ -8,6 +8,7 @@ import { createWhile } from "typescript";
 import { TurtleInterpreter } from "./turtleScript/turtleInterpreter";
 import { Repl } from "./components/Repl";
 import { StackHistory } from "./util/history";
+import { styles } from "./styles";
 
 const turtle = new Turtle();
 
@@ -47,7 +48,7 @@ function App() {
 
     return (
         <div className="App">
-            <canvas width={400} height={400} ref={canvasRef} />
+            <canvas width={styles.width} height={styles.height} ref={canvasRef} />
             <Repl onLine={onLine} onClear={() => onClear()} stackHistory={state.stackHistory} />
         </div>
     );

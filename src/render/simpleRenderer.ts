@@ -1,4 +1,5 @@
 import { debug } from "console";
+import { styles } from "../styles";
 import { Turtle } from "../turtles/turtle";
 import { Point } from "../util/geometry";
 import { EventArgs } from "../util/notifier";
@@ -7,17 +8,11 @@ export class SimpleRenderer {
     private _ctx: CanvasRenderingContext2D | null = null;
     private _turtle: Turtle | null = null;
     private _id: string = "simple-renderer";
+    private _previousLocation: Point | null = null;
+
+    styles = {...styles};
 
     private positionSequence: [number, number][] = [];
-
-    styles = {
-        strokeStyle: "#000",
-        fillStyle: "#333",
-        lineWidth: 10,
-        width: 200,
-        height: 200,
-        turtleLength: 5,
-    };
 
     translatePoint(point: Point): Point {
         return [point[0] + this.styles.width / 2, point[1] + this.styles.height / 2];
@@ -35,11 +30,11 @@ export class SimpleRenderer {
         }
         if (this._ctx) {
             const [x, y] = this.translatePoint([0, 0]);
-            this._ctx.moveTo(x, y);
-            this._ctx.beginPath();
             this.clearCanvas();
+            this.drawTurtle();
+            this._ctx.beginPath();
+            this._ctx.moveTo(x,y);
         }
-        // this.drawTurtle();
     }
 
     connect(ctx: CanvasRenderingContext2D, turtle: Turtle) {
@@ -51,10 +46,19 @@ export class SimpleRenderer {
             // this.positionSequence.push([turtle.x, turtle.y]);
             // this.render();
             if (!this._turtle || !this._ctx) return;
-            if (args.event === "set-angle") {
+            console.log(args);
+            if (args.event.includes("reset")) {
+                // this.reset();
+                this._previousLocation = [turtle.x, turtle.y];
+            } else if (args.event === "pre-set-angle") {
+                this.clearTurtle();
+            } else if (args.event === "set-angle") {
                 this.clearTurtle();
                 this.drawTurtle();
-            } else {
+            } else if (args.event === "pre-set-position") {
+                this.clearTurtle();
+            } else if (args.event === "set-position") {
+                this._previousLocation = [turtle.x, turtle.y];
                 const toPoint = this.translatePoint([this._turtle.x, this._turtle.y]);
                 this._ctx.lineTo(toPoint[0], toPoint[1]);
                 this._ctx.stroke();
@@ -65,9 +69,9 @@ export class SimpleRenderer {
         });
     }
 
-    drawTurtle() {
+    drawTurtle(fillStyle: string | null = null) {
         if (!this._turtle || !this._ctx) return;
-        const p1 = this.translatePoint(this._turtle.lookToward(this.styles.turtleLength, 0));
+        const p1 = this.translatePoint(this._turtle.lookToward(this.styles.turtleLength*2, 0));
         const p2 = this.translatePoint(this._turtle.lookToward(this.styles.turtleLength, 120));
         const p3 = this.translatePoint(this._turtle.lookToward(this.styles.turtleLength, 240));
         const path = new Path2D();
@@ -76,24 +80,23 @@ export class SimpleRenderer {
         path.lineTo(p3[0], p3[1]);
         path.closePath();
         this._ctx.save();
-        this._ctx.fillStyle = this.styles.fillStyle;
+        this._ctx.fillStyle = fillStyle ?? this.styles.fillStyle;
         this._ctx.fill(path);
         this._ctx.restore();
     }
 
     clearTurtle() {
         if (!this._turtle || !this._ctx) return;
-        const c = this.translatePoint([this._turtle.x, this._turtle.y]);
-        const r = 10 // this.styles.turtleLength;
-        this._ctx.save();
-        this._ctx.fillStyle = "#fff";
-        this._ctx.strokeStyle = "#fff";
-        this._ctx.beginPath();
-        this._ctx.ellipse(c[0], c[1], r, r, 0, 0, 2 * Math.PI);
-        // this._ctx.stroke();
-        this._ctx.fill();
-        this._ctx.moveTo(c[0], c[1]);
-        this._ctx.restore();
+        this.drawTurtle('#fff');
+        // const c = this.translatePoint([this._turtle.x, this._turtle.y]);
+        // const r = this.styles.turtleLength*2;
+        // this._ctx.save();
+        // this._ctx.fillStyle = "#fff";
+        // this._ctx.strokeStyle = "#fff";
+        // const path = new Path2D();
+        // path.ellipse(c[0], c[1], r, r, 0, 0, 2 * Math.PI);
+        // this._ctx.fill(path);
+        // this._ctx.restore();
     }
 
     // render() {
