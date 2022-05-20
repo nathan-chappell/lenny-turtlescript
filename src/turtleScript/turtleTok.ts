@@ -31,11 +31,11 @@ const singleCharCommands = Object.values(kwLists).map(a => a[0]);
 
 // prettier-ignore
 class TokenFactory {
-    makeMoveForwardToken(lexeme: Lexeme): TurtleToken { return {type: "command", value: "move-forward", lexeme }; }
-    makeMoveToToken(lexeme: Lexeme): TurtleToken { return {type: "command", value: "move-to", lexeme }; }
-    makeTurnLeftToken(lexeme: Lexeme): TurtleToken { return {type: "command", value: "turn-left", lexeme }; }
-    makeTurnRightToken(lexeme: Lexeme): TurtleToken { return {type: "command", value: "turn-right", lexeme }; }
-    makeTurnToToken(lexeme: Lexeme): TurtleToken { return {type: "command", value: "turn-to", lexeme }; }
+    makeMoveForwardToken(lexeme: Lexeme): CommandToken { return {type: "command", value: "move-forward", lexeme }; }
+    makeMoveToToken(lexeme: Lexeme): CommandToken { return {type: "command", value: "move-to", lexeme }; }
+    makeTurnLeftToken(lexeme: Lexeme): CommandToken { return {type: "command", value: "turn-left", lexeme }; }
+    makeTurnRightToken(lexeme: Lexeme): CommandToken { return {type: "command", value: "turn-right", lexeme }; }
+    makeTurnToToken(lexeme: Lexeme): CommandToken { return {type: "command", value: "turn-to", lexeme }; }
     
     makeNumberToken(lexeme: Lexeme): NumberToken { return {type: "number", value: parseFloat(lexeme.value), lexeme }; }
     makeInvalidToken(lexeme: Lexeme): InvalidToken { return {type: "invalid", lexeme }; }
